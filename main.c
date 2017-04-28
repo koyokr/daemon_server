@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include "error.h"
 #include <stdlib.h>
 #include <unistd.h>
 #include <signal.h>
@@ -7,15 +7,7 @@
 
 #define SERVER_PORT 2226
 
-void unix_error(const char *s)
-{
-	perror(s);
-	exit(EXIT_FAILURE);
-}
-
-void play(int fd)
-{
-}
+void play(int fd);
 
 void wait_client(int fd)
 {
@@ -32,7 +24,7 @@ void wait_client(int fd)
 			close(fd);
 			play(cfd);
 			close(cfd);
-			exit(EXIT_SUCCESS);
+			exit(0);
 		}
 		close(cfd);
 	}
@@ -85,3 +77,4 @@ int main(void)
 	create_server();
 	return 0;
 }
+
