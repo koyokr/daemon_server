@@ -8,6 +8,7 @@ all: $(TARGET)
 
 $(TARGET): $(OBJS)
 	$(CC) -o $@ $^
+	strip $@
 
 main.o: main.c error.h
 	$(CC) $(CFLAGS) -fno-stack-protector -O2 -c $<
