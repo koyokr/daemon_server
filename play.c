@@ -3,5 +3,5 @@
 void play(int fd)
 {
 	char buf[1024];
-	return fd;
+	return;
 }
