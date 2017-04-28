@@ -3,7 +3,6 @@
 #include <unistd.h>
 #include <signal.h>
 #include <arpa/inet.h>
-#include <sys/wait.h>
 
 #define SERVER_PORT 2226
 
@@ -73,4 +72,3 @@ int main(void)
 	create_server();
 	return 0;
 }
-
