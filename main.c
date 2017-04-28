@@ -12,11 +12,11 @@ void play(int fd);
 void wait_client(int fd)
 {
 	int cfd;
-	struct sockaddr_in csin;
-	socklen_t socklen = sizeof(struct sockaddr);
+	struct sockaddr_in sin;
+	socklen_t socklen;
 
 	while (1) {
-		cfd = accept(fd, (struct sockaddr *)&csin, &socklen);
+		cfd = accept(fd, (struct sockaddr *)&sin, &socklen);
 		if (cfd == -1)
 			continue;
 
@@ -33,7 +33,7 @@ void wait_client(int fd)
 void create_server(void)
 {
 	int fd;
-	struct sockaddr_in ssin = {
+	struct sockaddr_in sin = {
 		.sin_family      = AF_INET,
 		.sin_port        = htons(SERVER_PORT),
 		.sin_addr.s_addr = htonl(INADDR_ANY)
@@ -45,24 +45,20 @@ void create_server(void)
 		unix_error("socket");
 	if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &y, sizeof(y)))
 		unix_error("setsockopt");
-	if (bind(fd, (struct sockaddr *)&ssin, sizeof(struct sockaddr)) == -1)
+	if (bind(fd, (struct sockaddr *)&sin, sizeof(sin)) == -1)
 		unix_error("bind");
-	if (listen(fd, 10) == -1)
+	if (listen(fd, 5) == -1)
 		unix_error("listen");
 
 	wait_client(fd);
 }
 
-void waitpid_child(int signo)
-{
-	int stat;
-	waitpid(-1, &stat, WNOHANG);
-}
-
 void set_sigchld(void)
 {
-	struct sigaction sa = { .sa_handler = waitpid_child };
-	sigemptyset(&sa.sa_mask);
+	struct sigaction sa = {
+		.sa_handler = SIG_IGN,
+		.sa_flags = 0
+	};
 
 	if (sigaction(SIGCHLD, &sa, NULL) == -1)
 		unix_error("sigaction");

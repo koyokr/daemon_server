@@ -1,4 +1,7 @@
+#include "error.h"
+
 void play(int fd)
 {
-	return;
+	char buf[1024];
+	return fd;
 }
