@@ -8,16 +8,15 @@ all: $(TARGET)
 
 $(TARGET): $(OBJS)
 	$(CC) -o $@ $^
-	strip $@
 
 main.o: main.c error.h
-	$(CC) $(CFLAGS) -fno-stack-protector -O2 -c $<
+	$(CC) $(CFLAGS) -O2 -c $<
 
 play.o: play.c error.h
 	$(CC) $(CFLAGS) -O2 -c $<
 
 error.o: error.c error.h
-	$(CC) $(CFLAGS) -fno-stack-protector -O2 -c $<
+	$(CC) $(CFLAGS) -O2 -c $<
 
 clean:
-	rm -f $(TARGET) *.o
+	rm -f $(TARGET) $(OBJS)

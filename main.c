@@ -1,12 +1,11 @@
+#include "play.h"
 #include "error.h"
+
+#include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <signal.h>
+#include <unistd.h>
 #include <arpa/inet.h>
-
-#define SERVER_PORT 2226
-
-void play(int fd);
 
 void wait_client(int fd)
 {
@@ -23,21 +22,22 @@ void wait_client(int fd)
 			close(fd);
 			play(cfd);
 			close(cfd);
+
 			exit(0);
 		}
 		close(cfd);
 	}
 }
 
-void create_server(void)
+void start_server(int port)
 {
 	int fd;
 	struct sockaddr_in sin = {
 		.sin_family      = AF_INET,
-		.sin_port        = htons(SERVER_PORT),
+		.sin_port        = htons(port),
 		.sin_addr.s_addr = htonl(INADDR_ANY)
 	};
-	const int y = 1;
+	int y = 1;
 
 	fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (fd == -1)
@@ -63,12 +63,17 @@ void set_sigchld(void)
 		unix_error("sigaction");
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
-	if (daemon(0, 0) == -1)
+	if (argc != 2) {
+		printf("usage: %s <port>\n", argv[0]);
 		return 1;
+	}
+
+	if (daemon(0, 0) == -1)
+		unix_error("daemon");
 
 	set_sigchld();
-	create_server();
+	start_server(atoi(argv[1]));
 	return 0;
 }
