@@ -1,2 +1,2 @@
 #!/bin/bash
-nohup ./server > dev/null &
+nohup ./socket_daemon
