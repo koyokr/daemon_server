@@ -9,22 +9,22 @@
 
 static int client(int fd)
 {
-	int ret;
+	int status;
 
-	ret = communicate(fd);
+	status = communicate(fd);
 	close(fd);
 
-	exit(ret);
+	exit(status);
 }
 
 static void accept_loop(int fd)
 {
 	int cfd;
-	struct sockaddr_in sin;
-	socklen_t socklen;
+	struct sockaddr_in sa;
+	socklen_t slen;
 
 	while (1) {
-		cfd = accept(fd, (struct sockaddr *)&sin, &socklen);
+		cfd = accept(fd, (struct sockaddr *)&sa, &slen);
 		if (cfd == -1)
 			continue;
 
@@ -40,7 +40,7 @@ static int open_server(int domain, int port)
 {
 	int fd;
 	int y = 1;
-	struct sockaddr_in sin = {
+	struct sockaddr_in sa = {
 		.sin_family      = domain,
 		.sin_port        = htons(port),
 		.sin_addr.s_addr = htonl(INADDR_ANY)
@@ -53,7 +53,7 @@ static int open_server(int domain, int port)
 	if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &y, sizeof(y)) == -1)
 		unix_error("setsockopt");
 
-	if (bind(fd, (struct sockaddr *)&sin, sizeof(sin)) == -1)
+	if (bind(fd, (struct sockaddr *)&sa, sizeof(sa)) == -1)
 		unix_error("bind");
 
 	if (listen(fd, 5) == -1)
