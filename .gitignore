@@ -1,2 +1,2 @@
-server
+socket_daemon
 *.o
