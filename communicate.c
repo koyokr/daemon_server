@@ -5,11 +5,13 @@
 #include <string.h>
 #include <unistd.h>
 
+#define BUFLEN 1024
+
 static ssize_t read_wrap(int fd, char *buf)
 {
 	int len;
 	
-	len = read(fd, buf, BUFSIZ);
+	len = read(fd, buf, BUFLEN);
 	if (len == -1)
 		unix_error("read");
 
@@ -29,10 +31,8 @@ static ssize_t write_wrap(int fd, char const *buf)
 
 int communicate(int fd)
 {
-	char buf[BUFSIZ] = "Hello, world!\n";
-	int len;
+	char buf[BUFLEN] = "Hello, world!\n";
 
-	len = write_wrap(fd, buf);
-
+	write_wrap(fd, buf);
 	return 0;
 }
