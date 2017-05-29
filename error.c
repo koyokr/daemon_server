@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void unix_error(const char *s)
+void unix_error(char const *s)
 {
 	perror(s);
-	exit(EXIT_FAILURE);
+	exit(1);
 }

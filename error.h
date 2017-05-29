@@ -1,1 +1,1 @@
-void unix_error(const char *s);
+void unix_error(char const *s);

@@ -1,4 +1,4 @@
-#include "play.h"
+#include "communicate.h"
 #include "error.h"
 
 #include <stdio.h>
@@ -7,7 +7,17 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 
-void wait_client(int fd)
+static int client(int fd)
+{
+	int ret;
+
+	ret = communicate(fd);
+	close(fd);
+
+	exit(0);
+}
+
+static void accept_loop(int fd)
 {
 	int cfd;
 	struct sockaddr_in sin;
@@ -20,60 +30,54 @@ void wait_client(int fd)
 
 		if (!fork()) {
 			close(fd);
-			play(cfd);
-			close(cfd);
-
-			exit(0);
+			client(cfd);
 		}
 		close(cfd);
 	}
 }
 
-void start_server(int port)
+static int open_server(int domain, int port)
 {
 	int fd;
+	int y = 1;
 	struct sockaddr_in sin = {
-		.sin_family      = AF_INET,
+		.sin_family      = domain,
 		.sin_port        = htons(port),
 		.sin_addr.s_addr = htonl(INADDR_ANY)
 	};
-	int y = 1;
 
-	fd = socket(AF_INET, SOCK_STREAM, 0);
+	fd = socket(domain, SOCK_STREAM, 0);
 	if (fd == -1)
 		unix_error("socket");
-	if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &y, sizeof(y)))
+
+	if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &y, sizeof(y)) == -1)
 		unix_error("setsockopt");
+
 	if (bind(fd, (struct sockaddr *)&sin, sizeof(sin)) == -1)
 		unix_error("bind");
+
 	if (listen(fd, 5) == -1)
 		unix_error("listen");
 
-	wait_client(fd);
-}
-
-void set_sigchld(void)
-{
-	struct sigaction sa = {
-		.sa_handler = SIG_IGN,
-		.sa_flags = 0
-	};
-
-	if (sigaction(SIGCHLD, &sa, NULL) == -1)
-		unix_error("sigaction");
+	return fd;
 }
 
 int main(int argc, char *argv[])
 {
+	int fd;
+
 	if (argc != 2) {
-		printf("usage: %s <port>\n", argv[0]);
+		fprintf(stderr, "usage: %s <port>\n", argv[0]);
 		return 1;
 	}
 
 	if (daemon(0, 0) == -1)
 		unix_error("daemon");
 
-	set_sigchld();
-	start_server(atoi(argv[1]));
+	signal(SIGCHLD, SIG_IGN);
+
+	fd = open_server(AF_INET, atoi(argv[1]));
+	accept_loop(fd);
+
 	return 0;
 }
