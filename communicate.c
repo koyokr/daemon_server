@@ -34,5 +34,5 @@ int communicate(int fd)
 
 	len = write_wrap(fd, buf);
 
-	return len;
+	return 0;
 }

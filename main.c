@@ -14,7 +14,7 @@ static int client(int fd)
 	ret = communicate(fd);
 	close(fd);
 
-	exit(0);
+	exit(ret);
 }
 
 static void accept_loop(int fd)
