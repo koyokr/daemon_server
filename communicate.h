@@ -1,1 +1,1 @@
-int communicate(int fd);
+extern int communicate(int fd);
